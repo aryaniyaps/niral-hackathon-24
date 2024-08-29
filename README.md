@@ -157,6 +157,9 @@ Automated pipelines in NLP workflow have been helpful in terms of processing big
 
 ## How It Works
 
+![new_BERT_Overall (1)](https://github.com/user-attachments/assets/46031f80-99f0-42a2-a8db-a1c3f049b97b)
+
+
 ### Named Entity Recognition (NER) for Car Sales
 
 We have fine tuned a NER model, and ran sentiment analysis in order to accurately extract the correct car details from the transcripts.

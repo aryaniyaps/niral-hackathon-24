@@ -13,22 +13,9 @@ objection_classifier_pipeline = pipeline(
     device="cuda",
 )
 
-input_text = "Your sample text to classify."
 
-# Perform classification
-results = policy_classifier_pipeline(input_text)
-
-# Display the results
-print(results)
-print(
-    f"Predicted label: {results[0]['label']}, Confidence score: {results[0]['score']:.4f}"
+ner_pipeline = pipeline(
+    "ner", model="alstonpeter/finetuned-bert-car-sales-ner", device="cuda"
 )
 
-# Perform classification
-results = objection_classifier_pipeline(input_text)
-
-# Display the results
-print(results)
-print(
-    f"Predicted label: {results[0]['label']}, Confidence score: {results[0]['score']:.4f}"
-)
+sentiment_pipeline = pipeline("sentiment-analysis", device="cuda")

@@ -5,8 +5,13 @@ from app.models import (
     CustomerRequirements,
     ExtractedData,
 )
-from app.utils.label_mapping import policies_discussed_mapping
-from app.utils.pipeline import objection_classifier_pipeline, policy_classifier_pipeline
+from app.utils.label_mapping import ner_label_mapping, policies_discussed_mapping
+from app.utils.pipeline import (
+    ner_pipeline,
+    objection_classifier_pipeline,
+    policy_classifier_pipeline,
+    sentiment_pipeline,
+)
 
 
 def chunk_transcripts(transcript: str, lines_per_chunk: int = 2) -> list[str]:
@@ -66,15 +71,23 @@ def extract_data(audio_transcript: str) -> ExtractedData:
                 policy_discussed = policies_discussed_mapping.get(label_dict["label"])
                 if policy_discussed is not None:
                     policies_discussed.append(policy_discussed)
+    ner_result = ner_pipeline(audio_transcript)
+    sentiment_pipeline(audio_transcript)
+    customer_requirements = {
+        "car_type": None,
+        "fuel_type": None,
+        "color": None,
+        "distance_travelled": None,
+        "make_year": None,
+        "transmission_type": None,
+    }
+    for entity_label in ner_result:
+        entity = entity_label["entity"]
+        lookup_field = ner_label_mapping.get(entity)
+        if lookup_field is not None:
+            customer_requirements[lookup_field] = entity_label["word"]
     return ExtractedData(
-        customer_requirements=CustomerRequirements(
-            car_type="",
-            fuel_type="",
-            color="",
-            distance_travelled=10,
-            make_year=2024,
-            transmission_type="",
-        ),
+        customer_requirements=CustomerRequirements(**customer_requirements),
         company_policies_discussed=policies_discussed,
         customer_objections=CustomerObjections(
             refurbishment_quality=refurbishment_quality_issues,

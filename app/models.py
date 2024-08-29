@@ -11,17 +11,17 @@ class CompanyPolicy(StrEnum):
 
 
 class CustomerRequirements(BaseModel):
-    car_type: str
+    car_type: str | None
 
-    fuel_type: str
+    fuel_type: str | None
 
-    color: str
+    color: str | None
 
-    distance_travelled: int
+    distance_travelled: str | None
 
-    make_year: int
+    make_year: str | None
 
-    transmission_type: str
+    transmission_type: str | None
 
 
 class CustomerObjections(BaseModel):

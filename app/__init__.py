@@ -70,166 +70,154 @@ with gr.Blocks(
     title="Car Sales Transcript Extractor", css="footer {visibility: hidden}"
 ) as demo:
     gr.Markdown("## Car Sales Transcript Extractor")
-    with gr.Row():
-        # Inputs on the left
-        with gr.Column(scale=1):
-            input_type = gr.Radio(
-                choices=[InputType.TEXT, InputType.PDF, InputType.BULK],
-                label="Select Transcript Upload Type",
-                value=InputType.TEXT,
-            )
-            text_input = gr.Textbox(
-                label="Enter Transcript:",
-                lines=12,
-                visible=True,
-                key="text_input",
-            )
+    input_type = gr.Radio(
+        choices=[InputType.TEXT, InputType.PDF, InputType.BULK],
+        label="Select Transcript Upload Type",
+        value=InputType.TEXT,
+    )
+    text_input = gr.Textbox(
+        label="Enter Transcript:",
+        lines=12,
+        visible=True,
+        key="text_input",
+    )
 
-            file_input = gr.File(
-                label="Upload PDF file:",
-                file_types=[".pdf"],
-                visible=False,
-                key="pdf_upload_input",
-                type="binary",
-            )
+    file_input = gr.File(
+        label="Upload PDF file:",
+        file_types=[".pdf"],
+        visible=False,
+        key="pdf_upload_input",
+        type="binary",
+    )
 
-            bulk_input = gr.File(
-                label="Upload bulk file:",
-                file_types=[".csv", ".txt"],
-                visible=False,
-                key="bulk_upload_input",
-                type="binary",
-            )
+    bulk_input = gr.File(
+        label="Upload bulk file:",
+        file_types=[".csv", ".txt"],
+        visible=False,
+        key="bulk_upload_input",
+        type="binary",
+    )
 
-            # Hidden OCR checkbox, initially hidden
-            perform_ocr_field = gr.Checkbox(
-                value=False,
-                label="Perform OCR",
-                visible=False,
-                interactive=True,
-            )
+    # Hidden OCR checkbox, initially hidden
+    perform_ocr_field = gr.Checkbox(
+        value=False,
+        label="Perform OCR",
+        visible=False,
+        interactive=True,
+    )
 
-            # Hidden delimiter text field, initially hidden
-            delimiter_field = gr.Textbox(
-                label="Transcript Delimiter",
-                max_lines=1,
-                visible=False,
-                interactive=True,
-                value=",",
-            )
+    # Hidden delimiter text field, initially hidden
+    delimiter_field = gr.Textbox(
+        label="Transcript Delimiter",
+        max_lines=1,
+        visible=False,
+        interactive=True,
+        value=",",
+    )
 
-            generate_button = gr.Button(
-                "Extract from transcript",
-                interactive=False,
-                variant="primary",
-            )
+    generate_button = gr.Button(
+        "Extract from transcript",
+        interactive=False,
+        variant="primary",
+    )
 
-            # Show the correct input field based on the radio button selection
-            def render_input_box(selected_input: InputType) -> list[dict[str, Any]]:
-                match selected_input:
-                    case InputType.TEXT:
-                        return [
-                            gr.update(visible=True),
-                            gr.update(visible=False),
-                            gr.update(visible=False),
-                            gr.update(visible=False),  # Delimiter hidden
-                            gr.update(visible=False),  # Perform OCR hidden
-                            gr.update(
-                                value="Extract from transcript"
-                            ),  # Change button text
-                        ]
-                    case InputType.PDF:
-                        return [
-                            gr.update(visible=False),
-                            gr.update(visible=True),
-                            gr.update(visible=False),
-                            gr.update(visible=False),  # Delimiter hidden
-                            gr.update(visible=True),  # Perform OCR visible
-                            gr.update(
-                                value="Extract from transcript"
-                            ),  # Change button text
-                        ]
-                    case InputType.BULK:
-                        return [
-                            gr.update(visible=False),
-                            gr.update(visible=False),
-                            gr.update(visible=True),
-                            gr.update(visible=True),  # Delimiter visible
-                            gr.update(visible=False),  # Perform OCR hidden
-                            gr.update(
-                                value="Extract from transcripts"
-                            ),  # Change button text
-                        ]
+    # Show the correct input field based on the radio button selection
+    def render_input_box(selected_input: InputType) -> list[dict[str, Any]]:
+        match selected_input:
+            case InputType.TEXT:
+                return [
+                    gr.update(visible=True),
+                    gr.update(visible=False),
+                    gr.update(visible=False),
+                    gr.update(visible=False),  # Delimiter hidden
+                    gr.update(visible=False),  # Perform OCR hidden
+                    gr.update(value="Extract from transcript"),  # Change button text
+                ]
+            case InputType.PDF:
+                return [
+                    gr.update(visible=False),
+                    gr.update(visible=True),
+                    gr.update(visible=False),
+                    gr.update(visible=False),  # Delimiter hidden
+                    gr.update(visible=True),  # Perform OCR visible
+                    gr.update(value="Extract from transcript"),  # Change button text
+                ]
+            case InputType.BULK:
+                return [
+                    gr.update(visible=False),
+                    gr.update(visible=False),
+                    gr.update(visible=True),
+                    gr.update(visible=True),  # Delimiter visible
+                    gr.update(visible=False),  # Perform OCR hidden
+                    gr.update(value="Extract from transcripts"),  # Change button text
+                ]
 
-            input_type.change(
-                fn=render_input_box,
-                inputs=input_type,
-                outputs=[
-                    text_input,
-                    file_input,
-                    bulk_input,
-                    delimiter_field,
-                    perform_ocr_field,
-                    generate_button,
-                ],
-            )
+    input_type.change(
+        fn=render_input_box,
+        inputs=input_type,
+        outputs=[
+            text_input,
+            file_input,
+            bulk_input,
+            delimiter_field,
+            perform_ocr_field,
+            generate_button,
+        ],
+    )
 
-            # Enable/disable button and radio based on input state
-            def update_button_and_radio_interactivity(
-                text: str | None, pdf_file: BytesIO | None, bulk_file: BytesIO | None
-            ) -> tuple[dict[str, Any], dict[str, Any]]:
-                # Check if any input has a value
-                is_interactive = bool(text or pdf_file or bulk_file)
-                return (
-                    gr.update(interactive=is_interactive),  # For button
-                    gr.update(interactive=not is_interactive),  # For radio buttons
-                )
+    # Enable/disable button and radio based on input state
+    def update_button_and_radio_interactivity(
+        text: str | None, pdf_file: BytesIO | None, bulk_file: BytesIO | None
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        # Check if any input has a value
+        is_interactive = bool(text or pdf_file or bulk_file)
+        return (
+            gr.update(interactive=is_interactive),  # For button
+            gr.update(interactive=not is_interactive),  # For radio buttons
+        )
 
-            # Call the function when any input changes
-            text_input.change(
-                fn=update_button_and_radio_interactivity,
-                inputs=[text_input, file_input, bulk_input],
-                outputs=[generate_button, input_type],
-            )
-            file_input.change(
-                fn=update_button_and_radio_interactivity,
-                inputs=[text_input, file_input, bulk_input],
-                outputs=[generate_button, input_type],
-            )
-            bulk_input.change(
-                fn=update_button_and_radio_interactivity,
-                inputs=[text_input, file_input, bulk_input],
-                outputs=[generate_button, input_type],
-            )
+    # Call the function when any input changes
+    text_input.change(
+        fn=update_button_and_radio_interactivity,
+        inputs=[text_input, file_input, bulk_input],
+        outputs=[generate_button, input_type],
+    )
+    file_input.change(
+        fn=update_button_and_radio_interactivity,
+        inputs=[text_input, file_input, bulk_input],
+        outputs=[generate_button, input_type],
+    )
+    bulk_input.change(
+        fn=update_button_and_radio_interactivity,
+        inputs=[text_input, file_input, bulk_input],
+        outputs=[generate_button, input_type],
+    )
 
-            output_json = gr.JSON(label="Extracted data", scale=1, show_indices=False)
-            download_button = gr.DownloadButton(
-                label="Download JSON Output", interactive=False
-            )  # Initially hidden
+    output_json = gr.JSON(label="Extracted data", scale=1, show_indices=False)
+    download_button = gr.DownloadButton(
+        label="Download JSON Output", interactive=False
+    )  # Initially hidden
 
-            # Button click handler
-            generate_button.click(
-                fn=lambda text=None,
-                pdf_file=None,
-                perform_ocr_field=None,
-                bulk_file=None,
-                delimiter=None: extract_from_text(text)
-                if text
-                else extract_from_pdf(pdf_file, perform_ocr=perform_ocr_field)
-                if pdf_file
-                else extract_from_bulk_csv(bulk_file, delimiter=delimiter),
-                inputs=[
-                    text_input,
-                    file_input,
-                    perform_ocr_field,
-                    bulk_input,
-                    delimiter_field,
-                ],
-                outputs=[output_json, download_button],
-            )
-        # data visualization
-        with gr.Column(scale=1):
-            gr.Markdown("## data visualization goes here")
+    # Button click handler
+    generate_button.click(
+        fn=lambda text=None,
+        pdf_file=None,
+        perform_ocr_field=None,
+        bulk_file=None,
+        delimiter=None: extract_from_text(text)
+        if text
+        else extract_from_pdf(pdf_file, perform_ocr=perform_ocr_field)
+        if pdf_file
+        else extract_from_bulk_csv(bulk_file, delimiter=delimiter),
+        inputs=[
+            text_input,
+            file_input,
+            perform_ocr_field,
+            bulk_input,
+            delimiter_field,
+        ],
+        outputs=[output_json, download_button],
+    )
 
 if __name__ == "__main__":
     # Launch the Gradio app

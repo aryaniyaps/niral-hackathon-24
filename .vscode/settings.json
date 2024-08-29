@@ -1,0 +1,25 @@
+{
+    "[python]": {
+      "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "ruff.nativeServer": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [""],
+    "python.terminal.activateEnvironment": false,
+    "python.analysis.ignore": ["*"],
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
+  "terminal.integrated.env.linux": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  }

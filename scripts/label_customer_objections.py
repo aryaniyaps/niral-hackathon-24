@@ -3,10 +3,10 @@ import re
 
 # Define the categories and their labels
 categories = {
-    "1": "free_rc_transfer",
-    "2": "5_day_money_back_guarantee",
-    "3": "free_rsa_for_one_year",
-    "4": "return_policy",
+    "1": "Refurbishment Quality",
+    "2": "Car Issues",
+    "3": "Price Issues",
+    "4": "Customer Experience Issues",
     "5": "No Label",
 }
 

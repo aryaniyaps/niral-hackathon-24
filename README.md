@@ -2,6 +2,8 @@
 
 Completely analyze car sales audio transcripts to extract valuable information by training fine-tuned BERT models.
 
+## [Project resources- Video + Presentation](https://https://tinyurl.com/niral-hackathon-team-1-resources)
+
 ## Table of Contents
 
 1. [Local Development - Instructions](#local-development---instructions)

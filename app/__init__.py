@@ -6,7 +6,8 @@ import gradio as gr
 
 from app.constants import InputType
 from app.extract_data import extract_data
-from app.utils.pdf_to_text import pdf_bytes_to_text
+from app.utils.bulk_file_to_text import bulk_file_to_text
+from app.utils.pdf_to_text import pdf_bytes_to_text, pdf_ocr_to_text
 from app.utils.save_temp_file import save_to_temp_file
 
 gr.set_static_paths(paths=["../public/"])
@@ -26,9 +27,13 @@ def extract_from_text(text_input: str) -> list[str | gr.DownloadButton]:
 
 
 def extract_from_pdf(
-    file_input: BytesIO, perform_ocr: bool
+    file_input: bytes, perform_ocr: bool
 ) -> list[str | gr.DownloadButton]:
-    content = "" if perform_ocr else pdf_bytes_to_text(pdf_bytes=file_input)
+    content = (
+        pdf_ocr_to_text(pdf_bytes=file_input)
+        if perform_ocr
+        else pdf_bytes_to_text(pdf_bytes=file_input)
+    )
     extracted_data = extract_data(audio_transcript=content)
     output = extracted_data.model_dump_json(indent=4)
     return [
@@ -41,9 +46,15 @@ def extract_from_pdf(
     ]
 
 
-def extract_from_bulk_csv(file_input: BytesIO) -> list[str | gr.DownloadButton]:
-    content = file_input.read().decode("utf-8")
-    output = json.dumps({"input_content": content}, indent=4)
+def extract_from_bulk_csv(
+    file_input: bytes, delimiter: str
+) -> list[str | gr.DownloadButton]:
+    contents = bulk_file_to_text(file_bytes=file_input, delimiter=delimiter)
+    # serial execution - change to parallel if needed
+    extracted_data = [
+        extract_data(audio_transcript=audio_transcript) for audio_transcript in contents
+    ]
+    output = json.dumps(extracted_data, indent=4)
     return [
         output,
         gr.DownloadButton(
@@ -201,12 +212,19 @@ with gr.Blocks(
                 fn=lambda text=None,
                 pdf_file=None,
                 perform_ocr_field=None,
-                bulk_file=None: extract_from_text(text)
+                bulk_file=None,
+                delimiter=None: extract_from_text(text)
                 if text
                 else extract_from_pdf(pdf_file, perform_ocr=perform_ocr_field)
                 if pdf_file
-                else extract_from_bulk_csv(bulk_file),
-                inputs=[text_input, file_input, perform_ocr_field, bulk_input],
+                else extract_from_bulk_csv(bulk_file, delimiter=delimiter),
+                inputs=[
+                    text_input,
+                    file_input,
+                    perform_ocr_field,
+                    bulk_input,
+                    delimiter_field,
+                ],
                 outputs=[output_json, download_button],
             )
         # data visualization

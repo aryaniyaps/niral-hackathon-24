@@ -27,7 +27,7 @@ FROM python:3.12-slim
 
 # Install linux packages (if needed)
 # Install poppler and tesseract dependencies
-# RUN apt-get update && apt-get install -y poppler-utils tesseract-ocr libtesseract-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y poppler-utils tesseract-ocr libtesseract-dev && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /project

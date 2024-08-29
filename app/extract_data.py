@@ -7,6 +7,7 @@ from app.models import (
 
 
 def extract_data(audio_transcript: str) -> ExtractedData:
+    print("AUDIO TRANSCRIPT:\n", audio_transcript)
     return ExtractedData(
         customer_requirements=CustomerRequirements(
             car_type="",
